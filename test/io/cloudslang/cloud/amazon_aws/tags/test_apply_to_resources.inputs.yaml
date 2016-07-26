@@ -6,10 +6,10 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 #
 ####################################################
-testAmazonAttachVolumeLocal:
+testAmazonApplyTagsToResourcesLocal:
   testSuites: [amazon-local]
-  description: "Test that successfully attached to instance a specified Amazon AWS volume."
-  testFlowPath: io.cloudslang.cloud.amazon_aws.volumes.test_attach_volume_in_region
+  description: "Test that successfully applies tags to specified Amazon AWS resources."
+  testFlowPath: io.cloudslang.cloud.amazon_aws.tags.test_apply_to_resources
   inputs:
     - provider: <provider>
     - endpoint: <endpoint>
@@ -17,9 +17,10 @@ testAmazonAttachVolumeLocal:
     - credential: <credential>
     - proxy_host: <proxy_host>
     - proxy_port: <proxy_port>
+    - delimiter: <delimiter>
     - debug_mode: <debug_mode>
     - region: <region>
-    - volume_id: <volume_id>
-    - instance_id: <instance_id>
-    - device_name: <device_name>
+    - key_tags_string: <key_tags_string>
+    - value_tags_string: <value_tags_string>
+    - resource_ids_string: <resource_ids_string>
   result: SUCCESS

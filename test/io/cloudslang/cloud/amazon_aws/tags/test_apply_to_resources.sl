@@ -6,14 +6,14 @@
 #   http://www.apache.org/licenses/LICENSE-2.0
 ####################################################
 
-namespace: io.cloudslang.cloud.amazon_aws.snapshots
+namespace: io.cloudslang.cloud.amazon_aws.tags
 
 imports:
   lists: io.cloudslang.base.lists
   strings: io.cloudslang.base.strings
 
 flow:
-  name: test_create_snapshot_in_region
+  name: test_apply_to_resources
 
   inputs:
     - provider: 'amazon'
@@ -30,34 +30,42 @@ flow:
     - proxy_port:
         default: '8080'
         required: false
+    - delimiter:
+        default: ','
+        required: false
     - debug_mode:
         default: 'false'
         required: false
     - region:
         default: 'us-east-1'
         required: false
-    - volume_id
+    - key_tags_string
+    - value_tags_string
+    - resource_ids_string
 
   workflow:
-    - create_snapshot_in_region:
+    - apply_tag_to_resources:
         do:
-          create_snapshot_in_region:
+          apply_to_resources:
             - provider
             - endpoint
             - identity
             - credential
             - proxy_host
             - proxy_port
+            - delimiter
             - debug_mode
             - region
-            - volume_id
+            - key_tags_string
+            - value_tags_string
+            - resource_ids_string
         publish:
           - return_result
           - return_code
           - exception
         navigate:
           - SUCCESS: check_result
-          - FAILURE: CREATE_SNAPSHOT_FAILURE
+          - FAILURE: APPLY_TO_RESOURCES_FAILURE
 
     - check_result:
         do:
@@ -65,20 +73,20 @@ flow:
             - list_1: ${[str(exception), int(return_code)]}
             - list_2: ['', 0]
         navigate:
-          - SUCCESS: check_creation_message_exist
+          - SUCCESS: check_apply_tag_message_exist
           - FAILURE: CHECK_RESULT_FAILURE
 
-    - check_creation_message_exist:
+    - check_apply_tag_message_exist:
         do:
           strings.string_occurrence_counter:
             - string_in_which_to_search: ${return_result}
-            - string_to_find: 'id=snap-'
+            - string_to_find: 'Apply tags to resources process started successfully.'
         navigate:
           - SUCCESS: SUCCESS
-          - FAILURE: CHECK_CREATION_MESSAGE_FAILURE
+          - FAILURE: CHECK_APPLY_TO_RESOURCES_MESSAGE_FAILURE
 
   results:
     - SUCCESS
-    - CREATE_SNAPSHOT_FAILURE
+    - APPLY_TO_RESOURCES_FAILURE
     - CHECK_RESULT_FAILURE
-    - CHECK_CREATION_MESSAGE_FAILURE
+    - CHECK_APPLY_TO_RESOURCES_MESSAGE_FAILURE
